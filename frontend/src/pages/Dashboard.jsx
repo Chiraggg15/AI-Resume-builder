@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Trash2, Edit3, Settings, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Plus, FileText, Trash2, Edit3, Settings, AlertCircle, Sparkles, CheckCircle2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { resumeAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -170,6 +170,18 @@ export default function Dashboard() {
                     </button>
                     <button className="p-2 text-zinc-400 hover:text-emerald-400 rounded transition-colors" title="Edit">
                       <Edit3 size={16} />
+                    </button>
+                    <button 
+                      className="p-2 text-zinc-400 hover:text-blue-400 rounded transition-colors" 
+                      title="Download PDF"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/resume/${resume.id}`);
+                        // Small delay to allow navigation and rendering before printing
+                        setTimeout(() => window.print(), 1000);
+                      }}
+                    >
+                      <Download size={16} />
                     </button>
                   </div>
                   <button
