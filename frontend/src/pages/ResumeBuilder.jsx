@@ -137,9 +137,9 @@ export default function ResumeBuilder() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[
-              ['full_name','Full Name','John Doe'],['email','Work Email','john@company.com'],
-              ['phone','Phone Number','+1 (555) 000-0000'],['location','Location','San Francisco, CA'],
-              ['linkedin','LinkedIn URL','linkedin.com/in/johndoe'],['github','GitHub/Portfolio','github.com/johndoe'],
+              ['full_name','Full Name','Chirag Lama'],['email','Work Email','chirag@example.np'],
+              ['phone','Phone Number','+977 980-0000000'],['location','Location','Kathmandu, Nepal'],
+              ['linkedin','LinkedIn URL','linkedin.com/in/chiraglama'],['github','GitHub/Portfolio','github.com/chiraglama'],
             ].map(([field, label, placeholder]) => (
               <div key={field}>
                 <label className="label-glass">{label}</label>
@@ -179,7 +179,7 @@ export default function ResumeBuilder() {
                     <button className="text-zinc-500 hover:text-red-400 transition-colors" onClick={() => removeExp(i)}><Trash2 size={16}/></button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {[['company','Company','Google'],['position','Job Title','Senior Engineer']].map(([f,l,p]) => (
+                    {[['company','Company','Nepal Telecom'],['position','Job Title','Software Engineer']].map(([f,l,p]) => (
                       <div key={f}><label className="label-glass">{l}</label><input className="input-glass" placeholder={p} value={exp[f]||''} onChange={e=>updateExp(i,f,e.target.value)}/></div>
                     ))}
                     <div>
@@ -234,10 +234,10 @@ export default function ResumeBuilder() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {[
-                      ['institution','Institution','MIT'],
-                      ['degree','Degree Level','B.S.'],
+                      ['institution','Institution','Tribhuvan University'],
+                      ['degree','Degree Level','B.E. Computer'],
                       ['field_of_study','Major / Field','Computer Science'],
-                      ['grade','GPA (Optional)','3.9'],
+                      ['grade','GPA (Optional)','3.8 / 4.0'],
                     ].map(([f,l,p]) => (
                       <div key={f}><label className="label-glass">{l}</label><input className="input-glass" placeholder={p} value={edu[f]||''} onChange={e=>updateEdu(i,f,e.target.value)}/></div>
                     ))}
@@ -347,7 +347,7 @@ export default function ResumeBuilder() {
           </div>
           <div className="print-area bg-white text-zinc-900 rounded-sm p-8 max-w-4xl mx-auto shadow-2xl min-h-[850px] font-sans border-t-[16px] border-zinc-900">
             <div className="mb-6 pb-6 border-b border-zinc-200">
-              <h1 className="text-4xl font-extrabold text-zinc-950 uppercase tracking-tighter mb-2">{resume.personal_info.full_name || 'JOHN DOE'}</h1>
+              <h1 className="text-4xl font-extrabold text-zinc-950 uppercase tracking-tighter mb-2">{resume.personal_info.full_name || 'CHIRAG LAMA'}</h1>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-600 font-medium">
                 {resume.personal_info.email && <span>{resume.personal_info.email}</span>}
                 {resume.personal_info.phone && <span>• {resume.personal_info.phone}</span>}

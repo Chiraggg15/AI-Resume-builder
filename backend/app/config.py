@@ -22,8 +22,8 @@ class Config:
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
     DB_NAME = os.getenv("DB_NAME", "ai_resume_db")
 
-    # ── OpenAI ───────────────────────────────────────────────────────────────
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    # ── Gemini AI ────────────────────────────────────────────────────────────
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
     # ── App Settings ─────────────────────────────────────────────────────────
     DEBUG = os.getenv("FLASK_DEBUG", "True") == "True"

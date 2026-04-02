@@ -10,39 +10,43 @@ NOTE: Requires OPENAI_API_KEY set in .env
 """
 
 import os
-from openai import OpenAI
+import google.generativeai as genai
+from flask import current_app
 
-# Initialize client once (reads OPENAI_API_KEY from env automatically)
-_client = None
+# Initialize Gemini model (lazy-loading)
+_model = None
 
 
-def _get_client() -> OpenAI:
-    """Lazy-initialize the OpenAI client."""
-    global _client
-    if _client is None:
-        api_key = os.getenv("OPENAI_API_KEY")
+def _get_model():
+    """Configure and return the Gemini model."""
+    global _model
+    if _model is None:
+        api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            raise ValueError("OPENAI_API_KEY is not set in environment variables")
-        _client = OpenAI(api_key=api_key)
-    return _client
+            raise ValueError("GEMINI_API_KEY is not set in environment variables")
+        genai.configure(api_key=api_key)
+        _model = genai.GenerativeModel('gemini-flash-latest')
+    return _model
 
 
 def _chat(system_prompt: str, user_prompt: str, max_tokens: int = 1000) -> str:
     """
-    Send a chat completion request and return the response text.
-    Uses gpt-3.5-turbo (cost-effective for FYP).
+    Send a prompt to Gemini and return the response text.
+    Uses gemini-1.5-flash for speed and efficiency.
     """
-    client = _get_client()
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user",   "content": user_prompt},
-        ],
-        max_tokens=max_tokens,
-        temperature=0.7,
+    model = _get_model()
+    # Combine system and user prompts for Gemini (or use system_instruction if supported)
+    # For simplicity and compatibility, we prepend the system prompt:
+    full_prompt = f"{system_prompt}\n\nUser Request: {user_prompt}"
+    
+    response = model.generate_content(
+        full_prompt,
+        generation_config=genai.types.GenerationConfig(
+            max_output_tokens=max_tokens,
+            temperature=0.7,
+        )
     )
-    return response.choices[0].message.content.strip()
+    return response.text.strip()
 
 
 class AIService:
