@@ -25,6 +25,9 @@ class Config:
     # ── Gemini AI ────────────────────────────────────────────────────────────
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
+    # ── Google OAuth ─────────────────────────────────────────────────────────
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+
     # ── App Settings ─────────────────────────────────────────────────────────
     DEBUG = os.getenv("FLASK_DEBUG", "True") == "True"
     TESTING = False

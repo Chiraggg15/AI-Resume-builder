@@ -7,8 +7,10 @@ GET  /api/auth/me         → Get current user profile (protected)
 PUT  /api/auth/me         → Update profile (protected)
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token
+from google.oauth2 import id_token
+from google.auth.transport import requests
 from app import db
 from app.models.user import UserModel
 from app.utils.validators import is_valid_email, is_strong_password, validate_required_fields
@@ -119,3 +121,57 @@ def update_me():
         "message": "Profile updated",
         "user": UserModel.serialize(user),
     }), 200
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# POST /api/auth/google-login
+# ────────────────────────────────────────────────────────────────────────────
+@auth_bp.route("/google-login", methods=["POST"])
+def google_login():
+    """Verify Google token, then find/link or create user."""
+    data = request.get_json() or {}
+    token = data.get("credential")
+
+    if not token:
+        return jsonify({"error": "Credential token is required"}), 400
+
+    try:
+        # 1. Verify ID Token from Google
+        client_id = current_app.config.get("GOOGLE_CLIENT_ID")
+        print(f"DEBUG: Verifying Google Token for Client ID: {client_id}")
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), client_id)
+
+        # 2. Extract user info
+        google_id = idinfo["sub"]
+        email     = idinfo["email"].lower().strip()
+        full_name = idinfo.get("name", "Google User")
+
+        # 3. Check for existing user by google_id
+        user = UserModel.find_by_google_id(db, google_id)
+
+        if not user:
+            # 4. If not found by google_id, check by email (Account Linking)
+            user = UserModel.find_by_email(db, email)
+            if user:
+                # Link Google ID to existing manual account
+                UserModel.link_google_account(db, str(user["_id"]), google_id)
+                user["google_id"] = google_id
+            else:
+                # 5. Create new account if neither exists
+                user = UserModel.create(db, full_name, email, password=None)
+                UserModel.link_google_account(db, user["_id"], google_id)
+                user["google_id"] = google_id
+
+        # 6. Success -> Return JWT
+        access_token = create_access_token(identity=str(user["_id"]))
+
+        return jsonify({
+            "message": "Login successful",
+            "token": access_token,
+            "user": UserModel.serialize(user),
+        }), 200
+
+    except ValueError:
+        return jsonify({"error": "Invalid Google token"}), 401
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

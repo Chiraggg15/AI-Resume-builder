@@ -81,18 +81,24 @@ def analyze_resume():
 def generate_cover_letter():
     """Generate a personalized cover letter using GPT."""
     data = request.get_json() or {}
+    
+    # Handle both frontend naming conventions
+    resume_summary  = data.get("resume_summary", "").strip()
+    job_description = data.get("job_description", "").strip()
+    company_name    = (data.get("company_name") or data.get("company") or "").strip()
+    applicant_name  = (data.get("applicant_name") or "Applicant").strip()
 
-    required = ["resume_summary", "job_description", "company_name", "applicant_name"]
-    for field in required:
-        if not data.get(field):
-            return jsonify({"error": f"'{field}' is required"}), 400
+    if not company_name:
+        return jsonify({"error": "'company_name' is required"}), 400
+    if not resume_summary:
+        return jsonify({"error": "'resume_summary' is required"}), 400
 
     try:
         letter = AIService.generate_cover_letter(
-            resume_summary=data["resume_summary"],
-            job_description=data["job_description"],
-            company_name=data["company_name"],
-            applicant_name=data["applicant_name"],
+            resume_summary=resume_summary,
+            job_description=job_description or "General professional role",
+            company_name=company_name,
+            applicant_name=applicant_name,
         )
         return jsonify({"cover_letter": letter}), 200
     except Exception as e:

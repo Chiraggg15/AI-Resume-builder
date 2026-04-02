@@ -54,7 +54,8 @@ class UserModel:
         user_doc = {
             "full_name": full_name,
             "email": email.lower().strip(),
-            "password_hash": UserModel.hash_password(password),
+            "password_hash": UserModel.hash_password(password) if password else None,
+            "google_id": None, # Will be set for Google users
             "created_at": now,
             "updated_at": now,
             "profile": {
@@ -74,6 +75,25 @@ class UserModel:
     def find_by_email(db, email: str) -> dict | None:
         """Find a user by email (case-insensitive)."""
         return db[UserModel.COLLECTION].find_one({"email": email.lower().strip()})
+
+    @staticmethod
+    def find_by_google_id(db, google_id: str) -> dict | None:
+        """Find a user by their Google unique ID."""
+        return db[UserModel.COLLECTION].find_one({"google_id": google_id})
+
+    @staticmethod
+    def link_google_account(db, user_id: str, google_id: str) -> bool:
+        """Link a Google ID to an existing email-based account."""
+        result = db[UserModel.COLLECTION].update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$set": {
+                    "google_id": google_id,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        return result.modified_count > 0
 
     @staticmethod
     def find_by_id(db, user_id: str) -> dict | None:

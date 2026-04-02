@@ -1,3 +1,4 @@
+import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -19,6 +20,20 @@ export default function Register() {
   const [form, setForm]       = useState({ full_name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors]   = useState({});
+
+  const handleGoogleSuccess = async (response) => {
+    setLoading(true);
+    try {
+      const res = await authAPI.googleLogin(response.credential);
+      login(res.data.user, res.data.token);
+      toast.success(`Welcome, ${res.data.user.full_name}!`);
+      navigate('/dashboard');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Google signup failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,6 +119,21 @@ export default function Register() {
             >
               {loading ? <div className="w-5 h-5 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" /> : 'Get Started For Free'}
             </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-800"></div></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-zinc-950 px-2 text-zinc-500">Or continue with</span></div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Google registration failed')}
+                theme="filled_black"
+                shape="rectangular"
+                width="100%"
+              />
+            </div>
           </form>
 
           <p className="mt-8 text-center text-zinc-500 text-sm">

@@ -1,10 +1,18 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { aiAPI } from '../services/api';
 import toast from 'react-hot-toast';
-import { PenTool, Copy, Check, Sparkles, MoveRight, FileText } from 'lucide-react';
+import { PenTool, Copy, Check, Sparkles, MoveRight, FileText, UserCircle } from 'lucide-react';
 
 export default function CoverLetter() {
-  const [formData, setFormData] = useState({ job_title: '', company: '', job_description: '', skills: '' });
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({ 
+    job_title: '', 
+    company: '', 
+    job_description: '', 
+    skills: '',
+    resume_summary: user?.personal_info?.summary || '' // Pre-fill if user has a summary
+  });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [copied, setCopied] = useState(false);
@@ -20,7 +28,16 @@ export default function CoverLetter() {
     setLoading(true);
     try {
       const skillsArray = formData.skills.split(',').map(s => s.trim()).filter(Boolean);
-      const res = await aiAPI.generateCoverLetter({ ...formData, skills: skillsArray });
+      const payload = {
+        job_description: formData.job_description,
+        company_name:    formData.company,
+        resume_summary:  formData.resume_summary,
+        applicant_name:  user?.full_name || 'Applicant',
+        skills:          skillsArray,
+        job_title:       formData.job_title
+      };
+      
+      const res = await aiAPI.generateCoverLetter(payload);
       setResult(res.data.cover_letter);
       toast.success('Cover letter generated instantly.');
     } catch (err) {
@@ -74,8 +91,13 @@ export default function CoverLetter() {
             </div>
 
             <div>
+              <label className="label-glass">Your Background / Professional Summary *</label>
+              <textarea name="resume_summary" className="input-glass text-sm resize-y" rows="3" value={formData.resume_summary} onChange={handleChange} placeholder="Briefly describe your experience and unique value..." required />
+            </div>
+
+            <div>
               <label className="label-glass">Job Description <span className="text-zinc-600 font-normal">(Recommended)</span></label>
-              <textarea name="job_description" className="input-glass text-sm resize-y" rows="6" value={formData.job_description} onChange={handleChange} placeholder="Paste the job requirements here to perfectly tailor the letter..." />
+              <textarea name="job_description" className="input-glass text-sm resize-y" rows="5" value={formData.job_description} onChange={handleChange} placeholder="Paste the job requirements here to perfectly tailor the letter..." />
             </div>
 
             <button type="submit" className="btn-accent w-full mt-4 h-11 text-sm flex gap-2" disabled={loading}>

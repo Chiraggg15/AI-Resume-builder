@@ -54,6 +54,9 @@ export const authAPI = {
   /** Get current user profile */
   getMe: () => api.get('/auth/me'),
 
+  /** Login via Google SSO */
+  googleLogin: (credential) => api.post('/auth/google-login', { credential }),
+
   /** Update user profile */
   updateMe: (data) => api.put('/auth/me', data),
 };
