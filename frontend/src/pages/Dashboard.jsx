@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, Trash2, Edit3, Settings, AlertCircle, Sparkles, CheckCircle2, Download } from 'lucide-react';
+import { Plus, FileText, Trash2, Edit3, AlertCircle, Sparkles, CheckCircle2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { resumeAPI } from '../services/api';
+import { resumeAPI, docxAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
@@ -25,6 +25,26 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => { fetchResumes(); }, [fetchResumes]);
+
+  const handleDownloadDOCX = async (resume, e) => {
+    e.stopPropagation();
+    const loadingToast = toast.loading(`Generating ${resume.title || 'resume'}...`);
+    try {
+      const res = await docxAPI.generate(resume);
+      const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${resume.title || 'resume'}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('DOCX exported successfully!', { id: loadingToast });
+    } catch {
+      toast.error('Failed to generate DOCX', { id: loadingToast });
+    }
+  };
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
@@ -165,21 +185,21 @@ export default function Dashboard() {
                 {/* Footer Actions */}
                 <div className="border-t border-zinc-800/80 bg-zinc-900/30 px-4 py-3 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="flex gap-1">
-                    <button className="p-2 text-zinc-400 hover:text-white rounded transition-colors" title="Settings">
-                      <Settings size={16} />
-                    </button>
-                    <button className="p-2 text-zinc-400 hover:text-emerald-400 rounded transition-colors" title="Edit">
+                    <button 
+                      className="p-2 text-zinc-400 hover:text-emerald-400 rounded transition-colors" 
+                      title="Edit"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/resume/${resume.id}`);
+                      }}
+                    >
                       <Edit3 size={16} />
                     </button>
                     <button 
                       className="p-2 text-zinc-400 hover:text-blue-400 rounded transition-colors" 
-                      title="Download PDF"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/resume/${resume.id}`);
-                        // Small delay to allow navigation and rendering before printing
-                        setTimeout(() => window.print(), 1000);
-                      }}
+                      title="Download DOCX"
+                      disabled={deleting === resume.id}
+                      onClick={(e) => handleDownloadDOCX(resume, e)}
                     >
                       <Download size={16} />
                     </button>

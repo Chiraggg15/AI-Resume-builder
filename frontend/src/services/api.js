@@ -65,6 +65,9 @@ export const authAPI = {
 
   /** Reset password using token */
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
+
+  /** Change password while logged in */
+  changePassword: (data) => api.post('/auth/change-password', data),
 };
 
 
@@ -86,6 +89,12 @@ export const resumeAPI = {
 
   /** Delete a resume */
   delete: (id) => api.delete(`/resume/${id}`),
+
+  /** Get version history snapshots */
+  getHistory: (id) => api.get(`/resume/${id}/history`),
+
+  /** Restore a specific snapshot */
+  restore: (id, snapshotId) => api.post(`/resume/${id}/restore/${snapshotId}`),
 };
 
 
@@ -112,6 +121,14 @@ export const aiAPI = {
 export const interviewAPI = {
   /** Generate mock interview questions */
   generateQuestions: (data) => api.post('/interview/generate', data),
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOCX Export API
+// ═══════════════════════════════════════════════════════════════════════════
+export const docxAPI = {
+  /** Generate a .docx file for a resume */
+  generate: (resumeData) => api.post('/docx/generate', resumeData, { responseType: 'blob' }),
 };
 
 export default api;

@@ -10,6 +10,7 @@ import ResumeBuilder from './pages/ResumeBuilder';
 import CoverLetter from './pages/CoverLetter';
 import MockInterview from './pages/MockInterview';
 import Landing from './pages/Landing';
+import Settings from './pages/Settings';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -67,6 +68,7 @@ export default function App() {
                       <Route path="/resume/:id" element={<ResumeBuilder />} />
                       <Route path="/cover-letter" element={<CoverLetter />} />
                       <Route path="/mock-interview" element={<MockInterview />} />
+                      <Route path="/settings" element={<Settings />} />
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                   </main>

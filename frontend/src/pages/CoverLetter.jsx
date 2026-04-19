@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { aiAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import { PenTool, Copy, Check, Sparkles, MoveRight, FileText, UserCircle } from 'lucide-react';
+import AutoResizeTextarea from '../components/AutoResizeTextarea';
 
 export default function CoverLetter() {
   const { user } = useAuth();
@@ -92,12 +93,12 @@ export default function CoverLetter() {
 
             <div>
               <label className="label-glass">Your Background / Professional Summary *</label>
-              <textarea name="resume_summary" className="input-glass text-sm resize-y" rows="3" value={formData.resume_summary} onChange={handleChange} placeholder="Briefly describe your experience and unique value..." required />
+              <AutoResizeTextarea name="resume_summary" className="input-glass text-sm" rows="3" value={formData.resume_summary} onChange={handleChange} placeholder="Briefly describe your experience and unique value..." required />
             </div>
 
             <div>
               <label className="label-glass">Job Description <span className="text-zinc-600 font-normal">(Recommended)</span></label>
-              <textarea name="job_description" className="input-glass text-sm resize-y" rows="5" value={formData.job_description} onChange={handleChange} placeholder="Paste the job requirements here to perfectly tailor the letter..." />
+              <AutoResizeTextarea name="job_description" className="input-glass text-sm" rows="5" value={formData.job_description} onChange={handleChange} placeholder="Paste the job requirements here to perfectly tailor the letter..." />
             </div>
 
             <button type="submit" className="btn-accent w-full mt-4 h-11 text-sm flex gap-2" disabled={loading}>
