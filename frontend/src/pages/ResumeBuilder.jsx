@@ -145,8 +145,20 @@ export default function ResumeBuilder() {
       ].join('\n\n');
 
       const res = await aiAPI.analyzeResume({ resume_text: text, job_description: aiForm.job_description });
+      const score = res.data.analysis.ats_score;
       setAnalysis(res.data.analysis);
-      toast.success(`Analysis complete: ${res.data.analysis.ats_score}% Match`);
+      
+      // Persist score to DB if resume already exists
+      if (resumeId) {
+        try {
+          await resumeAPI.updateScore(resumeId, score);
+          setResume(prev => ({ ...prev, ats_score: score }));
+        } catch (err) {
+          console.error("Failed to persist ATS score", err);
+        }
+      }
+
+      toast.success(`Analysis complete: ${score}% Match`);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Analysis failed');
     } finally {

@@ -112,7 +112,7 @@ def update_me():
     data = request.get_json() or {}
 
     # Only allow updating profile sub-document fields
-    allowed = ["phone", "location", "linkedin", "github", "portfolio", "summary"]
+    allowed = ["phone", "location", "linkedin", "github", "portfolio", "summary", "profile_image"]
     profile_data = {k: v for k, v in data.items() if k in allowed}
 
     if not profile_data:

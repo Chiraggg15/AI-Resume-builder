@@ -65,6 +65,7 @@ class UserModel:
                 "github": "",
                 "portfolio": "",
                 "summary": "",
+                "profile_image": "",
             },
         }
         result = db[UserModel.COLLECTION].insert_one(user_doc)

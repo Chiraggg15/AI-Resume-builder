@@ -124,7 +124,7 @@ class ResumeModel:
         """Update allowed fields of a resume."""
         allowed_fields = [
             "title", "template", "personal_info", "experience",
-            "education", "skills", "projects", "certifications", "languages",
+            "education", "skills", "projects", "certifications", "languages", "ats_score",
         ]
         update_data = {k: v for k, v in data.items() if k in allowed_fields}
         update_data["updated_at"] = datetime.now(timezone.utc)

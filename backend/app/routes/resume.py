@@ -155,3 +155,29 @@ def restore_snapshot(resume_id, snapshot_id):
         "message": "Resume restored successfully",
         "resume": ResumeModel.serialize(updated),
     }), 200
+
+# ────────────────────────────────────────────────────────────────────────────
+# PUT /api/resume/<id>/score  — Update only the score
+# ────────────────────────────────────────────────────────────────────────────
+@resume_bp.route("/<resume_id>/score", methods=["PUT"])
+@jwt_required_custom
+def update_score(resume_id):
+    """Specifically update only the ATS score for a resume."""
+    user_id = get_current_user_id()
+    resume = ResumeModel.find_by_id(db, resume_id)
+
+    if not resume:
+        return jsonify({"error": "Resume not found"}), 404
+
+    if resume.get("user_id") != user_id:
+        return jsonify({"error": "Access denied"}), 403
+
+    data = request.get_json() or {}
+    score = data.get("ats_score")
+
+    if score is None:
+        return jsonify({"error": "ats_score is required"}), 400
+
+    ResumeModel.update_ats_score(db, resume_id, int(score))
+
+    return jsonify({"message": "Score updated successfully"}), 200

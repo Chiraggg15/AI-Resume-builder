@@ -95,6 +95,9 @@ export const resumeAPI = {
 
   /** Restore a specific snapshot */
   restore: (id, snapshotId) => api.post(`/resume/${id}/restore/${snapshotId}`),
+
+  /** Update only the ATS score */
+  updateScore: (id, score) => api.put(`/resume/${id}/score`, { ats_score: score }),
 };
 
 

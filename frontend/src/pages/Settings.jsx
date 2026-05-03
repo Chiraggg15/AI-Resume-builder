@@ -29,6 +29,33 @@ export default function Settings() {
 
   const [saving,   setSaving]   = useState(false);
   const [pwSaving, setPwSaving] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    
+    // Validate file size (max 800KB for base64 storage)
+    if (file.size > 800 * 1024) {
+      toast.error('Image is too large. Please use a file smaller than 800KB.');
+      return;
+    }
+
+    setImgLoading(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
+        const base64String = reader.result;
+        const res = await authAPI.updateMe({ profile_image: base64String });
+        updateUser(res.data.user);
+        toast.success('Profile picture updated!');
+      } catch (err) {
+        toast.error('Failed to upload image');
+      } finally {
+        setImgLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -94,8 +121,34 @@ export default function Settings() {
         <div className="w-full lg:w-64 shrink-0 space-y-4">
           {/* User Card */}
           <div className="glass-panel p-5 text-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-zinc-950 font-bold text-2xl mx-auto mb-3 shadow-lg shadow-emerald-500/20">
-              {initials}
+            <div className="relative group w-20 h-20 mx-auto mb-3">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-zinc-950 font-bold text-2xl shadow-lg shadow-emerald-500/20 overflow-hidden border-2 border-zinc-800">
+                {user?.profile?.profile_image ? (
+                  <img src={user.profile.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  initials
+                )}
+              </div>
+              
+              {/* Upload Overlay */}
+              <label 
+                htmlFor="avatar-upload" 
+                className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity"
+              >
+                {imgLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Save size={18} className="text-white" />
+                )}
+                <input 
+                  id="avatar-upload" 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => handleImageUpload(e.target.files[0])}
+                  disabled={imgLoading}
+                />
+              </label>
             </div>
             <h3 className="text-white font-bold text-base">{user?.full_name}</h3>
             <p className="text-zinc-500 text-xs mt-1 truncate">{user?.email}</p>
