@@ -19,7 +19,8 @@ MongoDB Document Structure:
     "github": str,
     "portfolio": str,
     "summary": str
-  }
+  },
+  "is_premium": bool
 }
 """
 
@@ -56,6 +57,7 @@ class UserModel:
             "email": email.lower().strip(),
             "password_hash": UserModel.hash_password(password) if password else None,
             "google_id": None, # Will be set for Google users
+            "is_premium": False,
             "created_at": now,
             "updated_at": now,
             "profile": {
@@ -168,6 +170,7 @@ class UserModel:
             "full_name": user_doc.get("full_name", ""),
             "email": user_doc.get("email", ""),
             "profile": user_doc.get("profile", {}),
+            "is_premium": user_doc.get("is_premium", False),
             "created_at": str(user_doc.get("created_at", "")),
         }
 

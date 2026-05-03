@@ -8,7 +8,11 @@ MongoDB Document Structure:
   "_id": ObjectId,
   "user_id": str,               # Reference to users._id
   "title": str,                 # e.g. "Software Engineer Resume"
-  "template": str,              # Template name for rendering
+  "template": {
+    "id": str,
+    "customizations": dict,
+    "appliedAt": datetime
+  },
   "personal_info": {
     "full_name": str,
     "email": str,
@@ -86,7 +90,11 @@ class ResumeModel:
         resume_doc = {
             "user_id": user_id,
             "title": data.get("title", "My Resume"),
-            "template": data.get("template", "modern"),
+            "template": data.get("template", {
+                "id": "classic-professional",
+                "customizations": {},
+                "appliedAt": now
+            }),
             "personal_info": data.get("personal_info", {}),
             "experience": data.get("experience", []),
             "education": data.get("education", []),

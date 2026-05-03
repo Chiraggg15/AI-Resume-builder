@@ -13,6 +13,7 @@ import Landing from './pages/Landing';
 import Settings from './pages/Settings';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import TemplateGallery from './pages/TemplateGallery';
 
 /* eslint-disable react/prop-types */
 const ProtectedRoute = ({ children }) => {
@@ -69,6 +70,7 @@ export default function App() {
                       <Route path="/cover-letter" element={<CoverLetter />} />
                       <Route path="/mock-interview" element={<MockInterview />} />
                       <Route path="/settings" element={<Settings />} />
+                      <Route path="/templates" element={<TemplateGallery />} />
                       <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                   </main>
